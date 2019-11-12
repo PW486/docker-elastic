@@ -2,9 +2,9 @@ version: '3.6'
 
 services:
   nginx:
-    image: 'nginx:latest'
+    image: nginx:1
     volumes:
-      - './nginx:/var/log/nginx'
+      - ./nginx:/var/log/nginx
     ports:
       - 8080:80
     environment:
@@ -17,7 +17,7 @@ services:
       args:
         STACK_VERSION: $STACK_VERSION
     volumes:
-      - 'esdata:/usr/share/elasticsearch/data'
+      - esdata:/usr/share/elasticsearch/data
     environment:
       - discovery.type=single-node
       - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
@@ -41,7 +41,10 @@ services:
       - elasticsearch
 
   kibana:
-    image: 'docker.elastic.co/kibana/kibana:${STACK_VERSION}'
+    build:
+      context: kibana/
+      args:
+        STACK_VERSION: $STACK_VERSION
     ports:
       - 8000:5601
     networks:
@@ -55,7 +58,7 @@ services:
       args:
         STACK_VERSION: $STACK_VERSION
     volumes:
-      - './nginx:/var/log/nginx'
+      - ./nginx:/var/log/nginx
     networks:
       - esnet
     depends_on:
@@ -63,7 +66,6 @@ services:
 
 volumes:
   esdata:
-    driver: local
     
 networks:
   esnet:
