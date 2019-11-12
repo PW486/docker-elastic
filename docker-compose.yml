@@ -4,9 +4,9 @@ services:
   nginx:
     image: nginx:latest
     volumes:
-      - logdata:/var/log/nginx
+      - ./nginx:/var/log/nginx
     ports:
-      - "8080:80"
+      - 8080:80
     environment:
       - NGINX_HOST=example.com
       - NGINX_PORT=80
@@ -55,7 +55,7 @@ services:
   filebeat:
     image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
     volumes:
-      - logdata:/var/log/nginx
+      - ./nginx:/var/log/nginx
       - type: bind
         source: ./filebeat.yml
         target: /usr/share/filebeat/filebeat.yml
