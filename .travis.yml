@@ -2,11 +2,10 @@ language: minimal
 services: docker
 
 env:
-  - DOCKER_COMPOSE_VERSION=1.24.1
+  - DOCKER_COMPOSE_VERSION=1.24.0
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get install -y expect jq
 
 install:
   # Install Docker Compose
@@ -15,13 +14,14 @@ install:
   - docker-compose --version
 
 before_script:
-  # Build images
   - docker-compose build
 
 script:
   - docker-compose up -d
+  - sleep 30
   - docker-compose ps
   - docker-compose logs elasticsearch
   - docker-compose logs kibana
   - docker-compose logs logstash
+  - docker-compose logs filebeat
   - docker-compose down -v
