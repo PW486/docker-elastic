@@ -2,9 +2,9 @@ version: '3.6'
 
 services:
   nginx:
-    image: nginx:latest
+    image: 'nginx:latest'
     volumes:
-      - ./nginx:/var/log/nginx
+      - './nginx:/var/log/nginx'
     ports:
       - 8080:80
     environment:
@@ -17,24 +17,22 @@ services:
       args:
         STACK_VERSION: $STACK_VERSION
     volumes:
-      - esdata:/usr/share/elasticsearch/data
+      - 'esdata:/usr/share/elasticsearch/data'
     environment:
       - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
     ports:
       - 9200:9200
     networks:
       - esnet
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:${STACK_VERSION}
-    volumes:
-      - type: bind
-        source: ./logstash.conf
-        target: /usr/share/logstash/pipeline/logstash.conf
-        read_only: true
+    build:
+      context: logstash/
+      args:
+        STACK_VERSION: $STACK_VERSION
     environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
     ports:
       - 5044:5044
     networks:
@@ -43,7 +41,7 @@ services:
       - elasticsearch
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    image: 'docker.elastic.co/kibana/kibana:${STACK_VERSION}'
     ports:
       - 8000:5601
     networks:
@@ -52,12 +50,12 @@ services:
       - elasticsearch
 
   filebeat:
-    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+    build:
+      context: filebeat/
+      args:
+        STACK_VERSION: $STACK_VERSION
     volumes:
-      - ./nginx:/var/log/nginx
-      - type: bind
-        source: ./filebeat.yml
-        target: /usr/share/filebeat/filebeat.yml
+      - './nginx:/var/log/nginx'
     networks:
       - esnet
     depends_on:
@@ -65,8 +63,6 @@ services:
 
 volumes:
   esdata:
-    driver: local
-  logdata:
     driver: local
     
 networks:
